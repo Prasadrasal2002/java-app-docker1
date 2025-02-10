@@ -15,7 +15,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'maven', credentialsId: 'jenkins-github-pat', url: 'https://github.com/Prasadrasal2002/java-app-docker1.git'
+                git branch: 'main', credentialsId: 'jenkins-github-pat', url: 'https://github.com/Prasadrasal2002/java-app-docker1.git'
             }
         }
 
