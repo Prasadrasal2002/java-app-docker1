@@ -1,6 +1,5 @@
 pipeline {
     agent any
-
     tools {
         maven 'maven'  // Ensure Maven is installed via Jenkins tools
     }
@@ -16,11 +15,17 @@ pipeline {
     }
 
     stages {
-        stage('Setup Maven') {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main', credentialsId: 'jenkins-github-pat', url: 'https://github.com/Prasadrasal2002/java-app-docker1.git'
+            }
+        }
+
+        stage('Setup Maven Settings') {
             steps {
                 script {
-                    sh 'mkdir -p /var/jenkins_home/.m2'
-                    sh 'cp java/.m2/settings.xml /var/jenkins_home/.m2/settings.xml'
+                    sh 'mkdir -p ~/.m2'
+                    sh 'cp .m2/settings.xml ~/.m2/settings.xml'
                 }
             }
         }
@@ -39,7 +44,7 @@ pipeline {
                                 -DartifactId=${ARTIFACT_ID} \
                                 -Dversion=${ARTIFACT_VERSION} \
                                 -Dpackaging=jar \
-                                --settings /var/jenkins_home/.m2/settings.xml
+                                --settings ~/.m2/settings.xml
                             """
                         }
                     }
