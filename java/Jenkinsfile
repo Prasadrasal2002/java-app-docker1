@@ -1,17 +1,16 @@
 pipeline {
     agent any
-    tools {
-        maven 'maven'
-    }
+
     environment {
         NEXUS_URL = 'http://nexus:8081'
         NEXUS_REPOSITORY = 'maven-releases'
         ARTIFACT_GROUP = 'com.example'
         ARTIFACT_ID = 'user-management'
         ARTIFACT_VERSION = '1.1.2'
-       ARTIFACT_FILE = '/target/user-management-1.0-SNAPSHOT.jar'
-        NEXUS_CREDENTIALS = 'nexus'  // Ensure this is set in Jenkins credentials
+        ARTIFACT_FILE = 'target/user-management-1.0-SNAPSHOT-shaded.jar'
+        NEXUS_CREDENTIALS = 'nexus'
     }
+
     stages {
         stage('Clone Repository') {
             steps {
@@ -19,42 +18,18 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Setup Maven Settings') {
             steps {
-                dir('java') {
-                    script {
-                        sh 'pwd'
-                        sh 'ls'
-                        sh 'mvn --version'
-                        sh 'mvn clean compile'
-                    }
-                }
-            }
-        }
-
-        stage('Test') {
-            steps {
-                dir('java') {
-                    script {
-                        sh 'mvn test'
-                    }
-                }
-            }
-        }
-
-        stage('Package') {
-            steps {
-                dir('java') {
-                    script {
-                        sh 'mvn package'
-                    }
+                script {
+                    sh 'mkdir -p ~/.m2'
+                    sh 'cp .m2/settings.xml ~/.m2/settings.xml'
                 }
             }
         }
 
         stage('Upload to Nexus') {
             steps {
-                dir('apps') {
+                dir('java') {
                     script {
                         withCredentials([usernamePassword(credentialsId: "${NEXUS_CREDENTIALS}", usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
                             sh """
@@ -66,21 +41,10 @@ pipeline {
                                 -DartifactId=${ARTIFACT_ID} \
                                 -Dversion=${ARTIFACT_VERSION} \
                                 -Dpackaging=jar \
-                                --settings ./settings.xml
+                                --settings ~/.m2/settings.xml
                             """
                         }
                     }
-                }
-            }
-        }
-
-        stage('CD Deploy to server' ) {
-            steps {
-                script {
-                    sh """
-                    echo "Downloading artifact from Nexus..."
-                    curl -u admin:admin -O ${NEXUS_URL}/repository/${NEXUS_REPOSITORY}/${ARTIFACT_GROUP}/${ARTIFACT_ID}/${ARTIFACT_VERSION}/${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar
-                    """
                 }
             }
         }
