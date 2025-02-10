@@ -25,7 +25,7 @@ pipeline {
             steps {
                 script {
                     sh 'mkdir -p ~/.m2'
-                    sh 'cp .m2/settings.xml ~/.m2/settings.xml'
+                    sh 'cp java/.m2/settings.xml ~/.m2/settings.xml'
                 }
             }
         }
