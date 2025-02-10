@@ -9,7 +9,7 @@ pipeline {
         ARTIFACT_GROUP = 'com.example'
         ARTIFACT_ID = 'SimpleJavaApp'
         ARTIFACT_VERSION = '1.1.2'
-       ARTIFACT_FILE = 'apps/target/SimpleJavaApp-1.0-SNAPSHOT.jar'
+       ARTIFACT_FILE = 'java/target/SimpleJavaApp-1.0-SNAPSHOT.jar'
         NEXUS_CREDENTIALS = 'nexus'  // Ensure this is set in Jenkins credentials
     }
     stages {
@@ -21,7 +21,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                dir('apps') {
+                dir('java') {
                     script {
                         sh 'pwd'
                         sh 'ls'
@@ -34,7 +34,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                dir('apps') {
+                dir('java') {
                     script {
                         sh 'mvn test'
                     }
@@ -44,7 +44,7 @@ pipeline {
 
         stage('Package') {
             steps {
-                dir('apps') {
+                dir('java') {
                     script {
                         sh 'mvn package'
                     }
@@ -54,7 +54,7 @@ pipeline {
 
         stage('Upload to Nexus') {
             steps {
-                dir('apps') {
+                dir('java') {
                     script {
                         withCredentials([usernamePassword(credentialsId: "${NEXUS_CREDENTIALS}", usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
                             sh """
