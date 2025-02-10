@@ -21,7 +21,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                dir('apps') {
+                dir('java') {
                     script {
                         sh 'pwd'
                         sh 'ls'
@@ -34,7 +34,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                dir('apps') {
+                dir('java') {
                     script {
                         sh 'mvn test'
                     }
@@ -44,7 +44,7 @@ pipeline {
 
         stage('Package') {
             steps {
-                dir('apps') {
+                dir('java') {
                     script {
                         sh 'mvn package'
                     }
