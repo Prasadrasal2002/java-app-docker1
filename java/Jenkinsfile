@@ -21,7 +21,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                dir('java') {
+                dir('apps') {
                     script {
                         sh 'pwd'
                         sh 'ls'
@@ -34,7 +34,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                dir('java') {
+                dir('apps') {
                     script {
                         sh 'mvn test'
                     }
@@ -44,7 +44,7 @@ pipeline {
 
         stage('Package') {
             steps {
-                dir('java') {
+                dir('apps') {
                     script {
                         sh 'mvn package'
                     }
@@ -54,7 +54,7 @@ pipeline {
 
         stage('Upload to Nexus') {
             steps {
-                dir('java') {
+                dir('apps') {
                     script {
                         withCredentials([usernamePassword(credentialsId: "${NEXUS_CREDENTIALS}", usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
                             sh """
