@@ -9,7 +9,7 @@ pipeline {
         ARTIFACT_GROUP = 'com.example'
         ARTIFACT_ID = 'SimpleJavaApp'
         ARTIFACT_VERSION = '1.1.2'
-       ARTIFACT_FILE = '/target/SimpleJavaApp-1.0-SNAPSHOT.jar'
+       ARTIFACT_FILE = 'java/target/SimpleJavaApp-1.0-SNAPSHOT.jar'
         NEXUS_CREDENTIALS = 'nexus'  // Ensure this is set in Jenkins credentials
     }
     stages {
