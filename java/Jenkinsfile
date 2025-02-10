@@ -9,7 +9,7 @@ pipeline {
         ARTIFACT_GROUP = 'com.example'
         ARTIFACT_ID = 'user-management'
         ARTIFACT_VERSION = '1.1.2'
-       ARTIFACT_FILE = '/var/jenkins_home/workspace/java-maven/apps/target/user-management-1.0-SNAPSHOT.jar'
+       ARTIFACT_FILE = '/target/user-management-1.0-SNAPSHOT.jar'
         NEXUS_CREDENTIALS = 'nexus'  // Ensure this is set in Jenkins credentials
     }
     stages {
