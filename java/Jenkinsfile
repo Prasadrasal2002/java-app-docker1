@@ -66,12 +66,14 @@ pipeline {
             }
         }
 
-        stage('CD Deploy to Server') {
+        stage('Download Artifact from Nexus') {
             steps {
                 script {
                     sh """
+                    set -e  # Exit on error
                     echo "Downloading artifact from Nexus..."
-                    curl -u admin:admin -O ${NEXUS_URL}/repository/${NEXUS_REPOSITORY}/${ARTIFACT_GROUP}/${ARTIFACT_ID}/${ARTIFACT_VERSION}/${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar
+                    curl -u admin:admin -o ${ARTIFACT_ID}.jar ${NEXUS_URL}/repository/${NEXUS_REPOSITORY}/${ARTIFACT_GROUP.replace('.', '/')}/${ARTIFACT_ID}/${ARTIFACT_VERSION}/${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar
+                    ls -lah ${ARTIFACT_ID}.jar
                     """
                 }
             }
