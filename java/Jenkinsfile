@@ -65,5 +65,16 @@ pipeline {
                 }
             }
         }
+
+        stage('CD Deploy to Server') {
+            steps {
+                script {
+                    sh """
+                    echo "Downloading artifact from Nexus..."
+                    curl -u admin:admin -O ${NEXUS_URL}/repository/${NEXUS_REPOSITORY}/${ARTIFACT_GROUP}/${ARTIFACT_ID}/${ARTIFACT_VERSION}/${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar
+                    """
+                }
+            }
+        }
     }
 }
