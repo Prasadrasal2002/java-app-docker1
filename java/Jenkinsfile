@@ -1,6 +1,5 @@
 pipeline {
     agent any
-
     tools {
         maven 'maven'  // Ensure Maven is installed via Jenkins tools
     }
@@ -12,7 +11,7 @@ pipeline {
         ARTIFACT_ID = 'user-management'
         ARTIFACT_VERSION = '1.1.2'
         ARTIFACT_FILE = "target/${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar"
-        NEXUS_CREDENTIALS = 'nexus'  // Credential ID stored in Jenkins
+        NEXUS_CREDENTIALS = 'nexus'
     }
 
     stages {
@@ -22,11 +21,20 @@ pipeline {
             }
         }
 
+        stage('Setup Maven Settings') {
+            steps {
+                script {
+                    sh 'mkdir -p ~/.m2'
+                    sh 'cp java/.m2/settings.xml ~/.m2/settings.xml'
+                }
+            }
+        }
+
         stage('Build with Maven') {
             steps {
                 dir('java') {
                     script {
-                        sh 'mvn clean package -DskipTests'
+                        sh 'mvn clean package -DskipTests --settings ~/.m2/settings.xml'
                     }
                 }
             }
@@ -47,10 +55,7 @@ pipeline {
                                     -DartifactId=${ARTIFACT_ID} \
                                     -Dversion=${ARTIFACT_VERSION} \
                                     -Dpackaging=jar \
-                                    -DgeneratePom=true \
-                                    -DrepositoryLayout=default \
-                                    -Dusername=${NEXUS_USER} \
-                                    -Dpassword=${NEXUS_PASS}
+                                    --settings ~/.m2/settings.xml
                                 """
                             }
                         } else {
@@ -61,20 +66,15 @@ pipeline {
             }
         }
 
-        stage('Download and Deploy Artifact') {
+        stage('Download Artifact from Nexus') {
             steps {
-                withCredentials([usernamePassword(credentialsId: "${NEXUS_CREDENTIALS}", usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
-                    script {
-                        sh """
-                        set -e  # Exit on error
-                        echo "Downloading artifact from Nexus..."
-                        curl -u $NEXUS_USER:$NEXUS_PASS -o ${ARTIFACT_ID}.jar ${NEXUS_URL}/repository/${NEXUS_REPOSITORY}/${ARTIFACT_GROUP.replace('.', '/')}/${ARTIFACT_ID}/${ARTIFACT_VERSION}/${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar
-                        ls -lah ${ARTIFACT_ID}.jar
-
-                        echo "Deploying application..."
-                        nohup java -jar ${ARTIFACT_ID}.jar > /dev/null 2>&1 &
-                        """
-                    }
+                script {
+                    sh """
+                    set -e  # Exit on error
+                    echo "Downloading artifact from Nexus..."
+                    curl -u admin:admin -o ${ARTIFACT_ID}.jar ${NEXUS_URL}/repository/${NEXUS_REPOSITORY}/${ARTIFACT_GROUP.replace('.', '/')}/${ARTIFACT_ID}/${ARTIFACT_VERSION}/${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar
+                    ls -lah ${ARTIFACT_ID}.jar
+                    """
                 }
             }
         }
